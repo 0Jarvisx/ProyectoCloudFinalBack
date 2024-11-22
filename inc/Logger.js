@@ -1,16 +1,14 @@
 const AWS = require('aws-sdk');
 const { v4: uuidv4 } = require('uuid');
 
-// Configuración de DynamoDB
 AWS.config.update({ region: 'us-east-1' });
 const dynamoDB = new AWS.DynamoDB.DocumentClient();
 
-// Función para registrar un evento
 async function logEvent(eventData) {
-  const { eventType, entityId, entityType, message } = eventData;
-
-  const id = entityId.toString(); // Clave de partición
-  const id_log = uuidv4(); // Clave de ordenación
+  const { eventType, entityId, entityType, message } = eventData;  
+  
+  const id = typeof entityId == 'string' ? entityId :  (typeof entityId != 'object') ? entityId.toString() : '0';
+  const id_log = uuidv4(); 
 
   const params = {
     TableName: 'BitacoraProyectoFinal', 

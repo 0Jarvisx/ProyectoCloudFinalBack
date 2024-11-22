@@ -5,13 +5,12 @@ const User = require('../Models/User');
 const { logEvent } = require('../inc/Logger');
 const {successResponse, errorResponse } = require('../inc/reponses');
 require("dotenv").config();
-// Agregar un comentario
+
 const addComment = async (req, res) => {
   const { content, postId, userId } = req.body;
   try {
     const comment = await Comment.create({ content, postId, userId });
 
-    // Registrar evento
     const eventData = {
       eventType: "CREATE",
       entityId: comment.id,
@@ -28,7 +27,6 @@ const addComment = async (req, res) => {
   }
 };
 
-// Obtener comentarios de un post
 const getComments = async (req, res) => {
   const { postId } = req.params;
   try {
@@ -61,6 +59,14 @@ const addLike = async (req, res) => {
 
     if (existingLike) {
       await existingLike.destroy();
+
+      const eventData = {
+        eventType: "DELETE",
+        entityId: existingLike.id,
+        entityType: "LIKE",
+        message: `Eliminando el like del ${postId} por el usuario ${userId}`,
+      };
+      if(process.env.ENVIROMENT === 'productive') await logEvent(eventData);
       return res
         .status(200)
         .json(
@@ -69,13 +75,18 @@ const addLike = async (req, res) => {
     }
     const like = await Like.create({ postId, userId });
     res.status(201).json(successResponse('Creado', like, 201));
+    const eventData = {
+      eventType: "CREATE",
+      entityId: existingLike.id,
+      entityType: "LIKE",
+      message: `Creando el like del ${postId} por el usuario ${userId}`,
+    };
+    if(process.env.ENVIROMENT === 'productive') await logEvent(eventData);
   } catch (error) {
     res.status(400).json(errorResponse(error.message, 400));
   }
 };
 
-
-// Obtener likes de un post
 const getLikes = async (req, res) => {
   const { postId } = req.params;
   try {

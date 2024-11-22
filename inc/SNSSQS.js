@@ -1,13 +1,9 @@
 const AWS = require('aws-sdk');
-
-// Configuración de AWS
 AWS.config.update({ region: 'us-east-1' });
 
-// Configuración de SNS y SQS
 const sns = new AWS.SNS();
 const sqs = new AWS.SQS();
 
-// Función para registrar un correo electrónico en un tema de SNS
 async function subscribeToSNSEmail(topicArn, email) {
   const params = {
     Protocol: 'email',
@@ -25,7 +21,6 @@ async function subscribeToSNSEmail(topicArn, email) {
   }
 }
 
-// Función para emitir un mensaje a un tema de SNS
 async function publishToSNS(topicArn, message, subject = 'Notificación') {
   const params = {
     TopicArn: topicArn,
@@ -43,7 +38,6 @@ async function publishToSNS(topicArn, message, subject = 'Notificación') {
   }
 }
 
-// Función para registrar un mensaje en una cola de SQS
 async function sendMessageToSQS(queueUrl, messageBody, messageAttributes = {}) {
   const params = {
     QueueUrl: queueUrl,
@@ -61,13 +55,6 @@ async function sendMessageToSQS(queueUrl, messageBody, messageAttributes = {}) {
   }
 }
 
-
-/**
- * Verificar si un correo electrónico está validado en un tema de SNS
- * @param {string} topicArn - ARN del tema de SNS
- * @param {string} email - Correo electrónico a validar
- * @returns {boolean} - Retorna `true` si el correo está validado, `false` en caso contrario
- */
 async function isEmailVerified(topicArn, email) {
     const params = {
       TopicArn: topicArn,
@@ -89,7 +76,7 @@ async function isEmailVerified(topicArn, email) {
           }
         }
   
-        nextToken = data.NextToken; // Avanzar al siguiente lote si existe
+        nextToken = data.NextToken;
       } while (nextToken && !isVerified);
   
       return isVerified;

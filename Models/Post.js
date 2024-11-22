@@ -17,7 +17,7 @@ const Post = sequelize.define('Post', {
       allowNull: false,
     },
     image: {
-      type: DataTypes.STRING, // Puede ser una URL o una ruta del sistema.
+      type: DataTypes.STRING, 
       allowNull: true,
     },
   }, {
